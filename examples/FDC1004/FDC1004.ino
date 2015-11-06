@@ -1,9 +1,8 @@
 /**************************************************************
  * Example Program for FDC1004 Library
- * This program will repeatedly read the capacitance on CAP1 of the FDC1004
- * and print the value to serial.
- * Capdac will automatically increment or decrement if the capacitance value goes out of range
- * Note that the output is a signed integer, so values greater than 7FFF FFFF are actually negative!
+ * This example demonstrates using the FDC1004 library to easily measure capacitance from your chip
+ * All calculations and ranging are handled by the library.
+ * For a more hands-on example, try FDC1004_raw.ino
  **************************************************************
  * Setup
  * Connect 3.3V and Ground to the FDC1004 (don't use 5V, you'll fry your chip!)
@@ -19,9 +18,9 @@
 #include <Wire.h>
 #include <FDC1004.h>
 
-int capdac = 0;
-
 FDC1004 fdc;
+//Or, specify a rate: 100HZ, 200HZ, 400HZ
+//FDC1004 fdc(FDC1004_400HZ)
 
 void setup() {
   //Wire.begin();
@@ -29,26 +28,9 @@ void setup() {
 }
 
 void loop() {
-  uint8_t measurement = 0;
-  uint8_t channel = 0;
-  char result[100];
-
-
-  fdc.configureMeasurementSingle(measurement, channel, capdac);
-  fdc.triggerSingleMeasurement(measurement, FDC1004_100HZ);
-  //wait for completion
-  delay(15);
-  uint16_t value[2];
-  if (! fdc.readMeasurement(measurement, value)) {
-    int16_t msb = (int16_t) value[0];
-    sprintf(result, "%04X %04X @ %02X\n", msb, value[1], capdac);
-    Serial.print(result);
-    //adjust capdac
-    if (msb > 0x7000) {
-      if (capdac < FDC1004_CAPDAC_MAX) capdac++;
-    } else if (msb < 0x8FF) {
-      if (capdac > 0) capdac--;
-    }
-  }
-  delay(20);
+  int32_t capacitance = fdc.getCapacitance(0);
+  //enable these lines to print calculated capacitance
+  Serial.print(capacitance);
+  Serial.print(" fF\n");
+  delay(1000);
 }
