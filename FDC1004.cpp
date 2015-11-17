@@ -9,10 +9,13 @@
 
 #include <FDC1004.h>
 
+#define FDC1004_UPPER_BOUND ((int16_t) 0x4000)
+#define FDC1004_LOWER_BOUND (-1 * FDC1004_UPPER_BOUND)
+
 uint8_t MEAS_CONFIG[] = {0x08, 0x09, 0x0A, 0x0B};
 uint8_t MEAS_MSB[] = {0x00, 0x02, 0x04, 0x06};
 uint8_t MEAS_LSB[] = {0x01, 0x03, 0x05, 0x07};
-uint8_t SAMPLE_DELAY[] = {12,12,7,3};
+uint8_t SAMPLE_DELAY[] = {11,11,6,3};
 
 FDC1004::FDC1004(uint16_t rate){
   this->_addr = 0b1010000; //not configurable, to my knowledge
@@ -145,9 +148,9 @@ uint8_t FDC1004::getRawCapacitance(uint8_t channel, fdc1004_measurement_t * valu
         value->value = (int16_t)raw_value[0];
 
         //adjust capdac if necessary
-        if (value->value > (int16_t)0x6000 && value->capdac < FDC1004_CAPDAC_MAX) {
+        if (value->value > FDC1004_UPPER_BOUND && value->capdac < FDC1004_CAPDAC_MAX) {
             value->capdac++;
-        } else if (value->value < (int16_t)0x9000 && value->capdac > 0) {
+        } else if (value->value < FDC1004_LOWER_BOUND && value->capdac > 0) {
             value->capdac--;
         } else {
             //out of range, but capdac is already maxed (or minned). Return.

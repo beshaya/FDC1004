@@ -39,6 +39,11 @@ void loop() {
   delay(15);
   uint16_t value[2];
   if (! fdc.readMeasurement(measurement, value)) {
+    
+    // calculate capacitance;
+    // The absolute capacitance is a function of the capdac and the measurement
+    // We only use the msb because the FDC1004 only has 16bits effective resolution;
+    // the last 8 bits are more or less random noise. 
     int16_t msb = (int16_t) value[0];
     int32_t capacitance = ((int32_t)457) * ((int32_t)msb); //in attofarads
     capacitance /= 1000; //in femtofarads
@@ -50,11 +55,13 @@ void loop() {
     Serial.print(" fF\n");
     
     //adjust capdac
-    if (msb > 0x7000) {
+    int16_t upper_bound = 0x4000;
+    int16_t lower_bound = -1 * upper_bound;
+    if (msb > upper_bound) {
       if (capdac < FDC1004_CAPDAC_MAX) capdac++;
-    } else if (msb < 0x8F00) {
+    } else if (msb < lower_bound) {
       if (capdac > 0) capdac--;
     }
   }
-  delay(20);
+  delay(200);
 }
