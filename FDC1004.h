@@ -27,9 +27,12 @@
 #define FDC1004_IS_MEAS(x) (x >= 0 && x <= FDC1004_MEAS_MAX)
                              
 #define FDC_REGISTER (0x0C)
-                             
-#define ATTOFARADS_UPPER_WORD (457) //number of attofarads for each 8th most lsb (lsb of the upper 16 bit half-word)
-#define FEMTOFARADS_CAPDAC (3028) //number of femtofarads for each lsb of the capdac
+
+// number of attofarads for each 8th most lsb (lsb of the upper 16 bit half-word)
+#define ATTOFARADS_UPPER_WORD (488)
+
+// number of femtofarads for each lsb of the capdac
+#define FEMTOFARADS_CAPDAC (3125)
                              
 /********************************************************************************************************
  * typedefs
